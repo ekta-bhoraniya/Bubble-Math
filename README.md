@@ -2,7 +2,7 @@
 
 A relaxing mental-math game set on a cartoon beach. Bubbles with equations fall toward the sand. Type the answer to pop each one before it lands. You have 5 lives.
 
-**Play it:** [https://YOUR-USERNAME.github.io/bubble-math-beach/](https://ekta-bhoraniya.github.io/Bubble-Math/)
+**Play it:** [https://ekta-bhoraniya.github.io/Bubble-Math/](https://ekta-bhoraniya.github.io/Bubble-Math/)
 
 ## How to play
 
