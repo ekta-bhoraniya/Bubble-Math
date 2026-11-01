@@ -50,7 +50,7 @@ Details:
 
 ## How many bubbles, and how fast
 
-At most 6 equation bubbles are on screen at once, alongside 100 plain decorative bubbles.
+At most 6 equation bubbles are on screen at once, alongside 100 plain decorative bubbles (40 on phones and tablets, to keep the game smooth there).
 
 | Time into the game | Equation bubbles allowed |
 |---|---|
