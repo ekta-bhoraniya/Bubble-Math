@@ -112,6 +112,9 @@ let W,H,S=1,dpr,horizon,sandY,T=0,t=0,st='idle',lives=5,score=0,level=0,prevLeve
 let bubbles=[],decoys=[],parts=[],floats=[];
 try{best=+localStorage.getItem('bmb-best')||0}catch(e){}
 const speck=Array.from({length:140},()=>[Math.random(),Math.random(),1+Math.random()*3]);
+// phones and tablets get a lighter scene and lighter audio so they stay smooth
+const LITE=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
+const DECOYS=LITE?40:100;
 
 // bubble sprites in three tints
 const sprites=['160,225,255','255,190,225','190,255,215'].map(c=>{
@@ -125,11 +128,13 @@ const sprites=['160,225,255','255,190,225','190,255,215'].map(c=>{
 });
 
 function resize(){
-  dpr=Math.min(devicePixelRatio||1,2);W=$('play').clientWidth;H=$('play').clientHeight;
+  const nd=Math.min(devicePixelRatio||1,2),nw=$('play').clientWidth,nh=$('play').clientHeight;
+  if(nw===W&&nh===H&&nd===dpr)return; // nothing changed: don't reallocate the canvas
+  dpr=nd;W=nw;H=nh;
   S=Math.max(.75,Math.min(1,Math.min(W,H*1.2)/700));
   cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
   horizon=H*.4;sandY=H-Math.max(90,H*.2);
-  if(!decoys.length)for(let i=0;i<100;i++)decoys.push(newDecoy(true));
+  if(!decoys.length)for(let i=0;i<DECOYS;i++)decoys.push(newDecoy(true));
 }
 function newDecoy(init){
   const r=(6+Math.random()*16)*S;
@@ -173,12 +178,12 @@ function hud(){
 }
 function showAns(){ans.textContent=typed||'\u00a0'}
 // ---- sound (all synthesized, no files) ----
-let AC,master,oceanG,white,soundOn=true;
-function noise(brown){const n=AC.sampleRate*4,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);let l=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;if(brown){l=(l+.02*w)/1.02;d[i]=l*8}else d[i]=w}return b}
+let AC,master,oceanG,white,clapBuf,clapBuilding=false,sleepTimer,soundOn=true;
+function noise(brown){const n=AC.sampleRate*2,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);let l=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;if(brown){l=(l+.02*w)/1.02;d[i]=l*8}else d[i]=w}return b}
 function loopFilter(buf,type,freq,q){const s=AC.createBufferSource();s.buffer=buf;s.loop=true;const f=AC.createBiquadFilter();f.type=type;f.frequency.value=freq;f.Q.value=q;s.connect(f);s.start();return f}
 function lfo(hz,depth,param){const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=hz;g.gain.value=depth;o.connect(g);g.connect(param);o.start()}
 function initAudio(){
-  if(AC){if(AC.state==='suspended')AC.resume();return}
+  if(AC){wake();return}
   try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return}
   master=AC.createGain();master.gain.value=soundOn?1:0;master.connect(AC.destination);
   oceanG=AC.createGain();oceanG.gain.value=0;oceanG.connect(master);
@@ -186,20 +191,28 @@ function initAudio(){
   // steady, soft water texture: no swells, no waves
   const rumble=loopFilter(noise(true),'lowpass',200,.5),sg=AC.createGain();sg.gain.value=.04;rumble.connect(sg);sg.connect(oceanG);
   const hiss=loopFilter(white,'lowpass',1100,.3),hg=AC.createGain();hg.gain.value=.006;hiss.connect(hg);hg.connect(oceanG);
-  // warm pad: a soft D major 6/9 chord with slow breathing and a long reverb tail
-  const ir=AC.createBuffer(2,AC.sampleRate*3,AC.sampleRate);
-  for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3)}
-  const verb=AC.createConvolver();verb.buffer=ir;
+  // warm pad: a soft D major 6/9 chord with slow breathing and a long reverb tail.
+  // The reverb is a constant CPU load, so phones get the pad without it.
   const pad=AC.createGain();pad.gain.value=.11;
   const plp=AC.createBiquadFilter();plp.type='lowpass';plp.frequency.value=900;pad.connect(plp);
-  const dry=AC.createGain(),wet=AC.createGain();dry.gain.value=.6;wet.gain.value=1;
-  plp.connect(dry);plp.connect(verb);verb.connect(wet);dry.connect(oceanG);wet.connect(oceanG);
+  const dry=AC.createGain();dry.gain.value=LITE?1:.6;plp.connect(dry);dry.connect(oceanG);
+  if(!LITE){
+    const ir=AC.createBuffer(2,AC.sampleRate*3,AC.sampleRate);
+    for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<d.length;i++){const k=1-i/d.length;d[i]=(Math.random()*2-1)*k*k*k}}
+    const verb=AC.createConvolver();verb.buffer=ir;
+    const wet=AC.createGain();wet.gain.value=1;
+    plp.connect(verb);verb.connect(wet);wet.connect(oceanG);
+  }
   [[146.83,.5],[220,.42],[329.63,.28],[369.99,.2],[493.88,.12]].forEach(([f,a],i)=>{
     [-4,4].forEach(dt=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;o.detune.value=dt;g.gain.value=a*.5;lfo(.025+i*.011,a*.35,g.gain);o.connect(g);g.connect(pad);o.start()});
   });
 }
-function oceanFade(on){if(AC&&oceanG)oceanG.gain.setTargetAtTime(on?1:0,AC.currentTime,on?3:1.5)}
-function toggleSound(){soundOn=!soundOn;$('snd').textContent=soundOn?'🔊':'🔇';if(master)master.gain.setTargetAtTime(soundOn?1:0,AC.currentTime,.05)}
+// Pause the whole audio engine whenever nothing should be heard, so it uses no CPU.
+function wake(){clearTimeout(sleepTimer);if(AC&&soundOn&&st==='play'&&!document.hidden&&AC.state==='suspended')AC.resume()}
+function sleep(delay){clearTimeout(sleepTimer);if(!AC)return;sleepTimer=setTimeout(()=>{if(AC.state==='running')AC.suspend()},delay)}
+function oceanFade(on){if(AC&&oceanG)oceanG.gain.setTargetAtTime(on?1:0,AC.currentTime,on?3:1.5);if(on)wake();else sleep(6000)}
+function toggleSound(){soundOn=!soundOn;$('snd').textContent=soundOn?'🔊':'🔇';if(master)master.gain.setTargetAtTime(soundOn?1:0,AC.currentTime,.05);if(soundOn)wake();else sleep(300)}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)sleep(0);else wake()});
 function sPop(){
   if(!AC||!soundOn)return;const t0=AC.currentTime,f=500+Math.random()*500;
   const o=AC.createOscillator(),g=AC.createGain();o.type='sine';
@@ -218,17 +231,30 @@ function sWrong(){
   g.gain.setValueAtTime(.16,t0);g.gain.setValueAtTime(.16,t0+.15);g.gain.exponentialRampToValueAtTime(.0001,t0+.22);
   o.connect(lp);lp.connect(g);g.connect(master);o.start(t0);o.stop(t0+.25);
 }
+// The applause is rendered once, off the live audio graph, into a buffer that is
+// replayed on every level-up. Building ~1000 live nodes per level-up froze phones.
 function sClap(){
   if(!AC||!soundOn)return;
-  const D=3.4,t0=AC.currentTime+.03,sr=AC.sampleRate;
+  if(clapBuf){const s=AC.createBufferSource();s.buffer=clapBuf;s.connect(master);s.start(AC.currentTime+.03);return}
+  buildClap();
+}
+function buildClap(){
+  if(clapBuf||clapBuilding||!AC||!window.OfflineAudioContext)return;clapBuilding=true;
+  const sr=AC.sampleRate,oc=new OfflineAudioContext(2,Math.ceil(sr*5.2),sr);
+  renderClap(oc,oc.destination,LITE?110:190);
+  const done=b=>{clapBuf=b;clapBuilding=false};
+  const p=oc.startRendering();if(p&&p.then)p.then(done,()=>{clapBuilding=false});else oc.oncomplete=e=>done(e.renderedBuffer);
+}
+function renderClap(AC,out,voices){
+  const D=3.4,t0=.03,sr=AC.sampleRate;
   // a hall full of people: soft room reverb behind a crowd of overlapping claps
   const ir=AC.createBuffer(2,sr*1.6,sr);
   for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2.5)}
   const verb=AC.createConvolver();verb.buffer=ir;
   const bus=AC.createGain(),lp=AC.createBiquadFilter(),dry=AC.createGain(),wet=AC.createGain();
-  bus.gain.value=1.3;lp.type='lowpass';lp.frequency.value=4500;dry.gain.value=.55;wet.gain.value=.7;
-  bus.connect(lp);lp.connect(dry);lp.connect(verb);verb.connect(wet);dry.connect(master);wet.connect(master);
-  for(let n=0;n<190;){
+  bus.gain.value=1.3*Math.sqrt(190/voices);lp.type='lowpass';lp.frequency.value=4500;dry.gain.value=.55;wet.gain.value=.7;
+  bus.connect(lp);lp.connect(dry);lp.connect(verb);verb.connect(wet);dry.connect(out);wet.connect(out);
+  for(let n=0;n<voices;){
     let t=Math.random()*D;
     if(Math.random()>Math.min(t/.5,1)*Math.min((D-t)/1.2,1))continue;
     n++;
@@ -240,7 +266,7 @@ function sClap(){
     const g=AC.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.03+Math.random()*.06,t+.003);g.gain.exponentialRampToValueAtTime(.0001,t+.03+Math.random()*.04);
     s.connect(hp);hp.connect(bp);bp.connect(g);
     if(AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=Math.random()*1.6-.8;g.connect(p);p.connect(bus)}else g.connect(bus);
-    s.start(t,Math.random()*3);s.stop(t+.09);
+    s.start(t,Math.random()*(white.duration-.1));s.stop(t+.09);
   }
 }
 function release(){bubbles.forEach(b=>b.hold=false)}
@@ -272,7 +298,7 @@ function lose(b){
 function start(){
   if(st==='play')return;
   st='play';t=0;lives=5;score=0;level=0;prevLevel=0;streak=0;levelTime=0;typed='';bubbles=[];parts=[];floats=[];lastSpawn=-9;
-  initAudio();oceanFade(true);ov.hidden=true;ans.style.visibility='visible';ans.classList.remove('bad');showAns();hud();
+  initAudio();oceanFade(true);setTimeout(buildClap,60);ov.hidden=true;ans.style.visibility='visible';ans.classList.remove('bad');showAns();hud();
 }
 function end(){
   st='over';typed='';ans.style.visibility='hidden';oceanFade(false);
@@ -392,7 +418,7 @@ function sand(){
   const g=ctx.createLinearGradient(0,sandY,0,H);g.addColorStop(0,'#dcae64');g.addColorStop(.12,'#f3d28f');g.addColorStop(1,'#f8e0a8');
   ctx.fillStyle=g;ctx.fill();ctx.lineWidth=4;ctx.strokeStyle=INK;ctx.stroke();
   ctx.fillStyle='rgba(160,110,50,.35)';
-  for(const[a,b,r]of speck){ctx.beginPath();ctx.arc(a*W,sandY+34+b*(H-sandY-34),r,0,7);ctx.fill()}
+  ctx.beginPath();for(const[a,b,r]of speck){const x=a*W,y=sandY+34+b*(H-sandY-34);ctx.moveTo(x+r,y);ctx.arc(x,y,r,0,7)}ctx.fill();
   star(W*.12,sandY+(H-sandY)*.55,20,.3);star(W*.82,sandY+(H-sandY)*.72,13,-.4);
 }
 function drawBubbles(){
