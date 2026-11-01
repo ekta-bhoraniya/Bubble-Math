@@ -87,7 +87,16 @@ Because the speed scales with the screen height, taller and shorter windows give
 
 ## Tech
 
-A single `index.html` with no build step and no dependencies. Graphics are drawn on a canvas, and all sounds (ocean ambience, pop, wrong answer, applause) are synthesized with the Web Audio API. The only external request is the Baloo 2 font from Google Fonts. Your best score is saved in your browser.
+A single `index.html` with no build step and no dependencies. Graphics are drawn on a canvas, and all sounds (ocean ambience, pop, wrong answer, applause) are synthesized with the Web Audio API. Your best score is saved in your browser.
+
+Performance:
+
+- **One small download.** The page is about 10 KB gzipped, plus an 18 KB font. Everything comes from the same site, so there are no extra connections to other servers.
+- **Self-hosted font.** `baloo2.woff2` is Baloo 2 (SIL Open Font License), cut down to the characters the game uses (plain English letters, digits, punctuation, × ÷ −). It is preloaded, and the text shows in a fallback font until it arrives, so a slow network never blocks the game.
+- **Works offline.** After the first visit, a service worker (`sw.js`) serves the game from the device's cache, so it opens instantly and plays with no connection. It checks for a newer version in the background, and that version is used on the next visit. When you change any cached file, bump `CACHE` in `sw.js` (for example `bmb-v2`).
+- **Installable.** `manifest.webmanifest` lets phones add the game to the home screen as an app.
+- **Cheaper frames.** The sky, sea and sand texture are drawn once per screen resize and then copied each frame, instead of being redrawn from gradients. This cuts drawing time by about a quarter on devices without graphics acceleration.
+- **Battery-friendly audio.** The audio engine pauses when sound is muted, between rounds, and when the tab is in the background.
 
 ## Responsive design
 
@@ -101,9 +110,12 @@ A single `index.html` with no build step and no dependencies. Graphics are drawn
 | File | Purpose |
 |---|---|
 | `index.html` | The whole game |
+| `baloo2.woff2` | The game font (subset) |
+| `sw.js` | Service worker for offline play and fast repeat visits |
+| `manifest.webmanifest` | Lets the game be installed to a home screen |
 | `og-image.png` | 1200 × 630 preview image for social media and chat links |
 | `favicon.svg`, `favicon.ico`, `favicon-48.png`, `apple-touch-icon.png` | Browser tab and home-screen icons |
-| `icon-192.png`, `icon-512.png` | Larger app icons for future use |
+| `icon-192.png`, `icon-512.png` | App icons used by the manifest |
 | `sitemap.xml` | Lists the page for search engines |
 
 The page includes a title, description, canonical link, Open Graph and Twitter card tags, and structured data (schema.org `VideoGame`) for search results and link previews. If you change the site address, update the URLs in the `<head>` of `index.html` and in `sitemap.xml`.
