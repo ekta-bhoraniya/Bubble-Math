@@ -29,8 +29,10 @@
 <meta name="twitter:image" content="https://ekta-bhoraniya.github.io/Bubble-Math/og-image.png">
 <meta name="twitter:image:alt" content="Cartoon beach with floating bubbles that contain math equations such as 7 + 5 and 9 × 6">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Bubble Math Beach","description":"Pop bubbles by solving quick mental-math equations on a cartoon beach. Free, relaxing and no sign-up. Practice addition, subtraction, multiplication and division across 9 levels.","url":"https://ekta-bhoraniya.github.io/Bubble-Math/","image":"https://ekta-bhoraniya.github.io/Bubble-Math/og-image.png","genre":["Educational","Puzzle"],"gamePlatform":"Web browser","applicationCategory":"Game","operatingSystem":"Any","inLanguage":"en","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="baloo2.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{font-family:"Baloo 2";font-style:normal;font-weight:600 800;font-display:swap;src:url(baloo2.woff2) format("woff2")}
 :root{--ink:#1d3b5c;--card:#fff8e6;--fg:#1d3b5c;--coral:#ff6b57;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--card:#173152;--fg:#fff3d1}}
 :root[data-theme="dark"]{--card:#173152;--fg:#fff3d1}
@@ -104,7 +106,7 @@ body{overscroll-behavior:none;-webkit-user-select:none;user-select:none}
   </div></div>
 </div>
 <script>
-const INK='#1d3b5c',cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const INK='#1d3b5c',cv=document.getElementById('c');let ctx=cv.getContext('2d');
 const $=id=>document.getElementById(id),ov=$('ov'),ans=$('answer');
 const F=s=>`800 ${s}px "Baloo 2","Trebuchet MS",system-ui,sans-serif`;
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
@@ -134,6 +136,7 @@ function resize(){
   S=Math.max(.75,Math.min(1,Math.min(W,H*1.2)/700));
   cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
   horizon=H*.4;sandY=H-Math.max(90,H*.2);
+  bake();
   if(!decoys.length)for(let i=0;i<DECOYS;i++)decoys.push(newDecoy(true));
 }
 function newDecoy(init){
@@ -141,6 +144,27 @@ function newDecoy(init){
   return{x:Math.random()*W,y:init?Math.random()*H:-r-Math.random()*H*.5,r,v:H*(.05+Math.random()*.07),ph:Math.random()*6,sp:rnd(0,2),a:.45+Math.random()*.4};
 }
 if(window.ResizeObserver)new ResizeObserver(resize).observe($('play'));else addEventListener('resize',resize);
+
+// static layers, rebuilt only on resize so each frame does less work
+let sandG,skyBase,sandBase,sandTop;
+function bake(){
+  const skyG=ctx.createLinearGradient(0,0,0,horizon);skyG.addColorStop(0,'#5fcbff');skyG.addColorStop(1,'#d9f5ff');
+  const seaG=ctx.createLinearGradient(0,horizon,0,sandY+20);seaG.addColorStop(0,'#4fd3df');seaG.addColorStop(1,'#0e8fb8');
+  sandG=ctx.createLinearGradient(0,sandY,0,H);sandG.addColorStop(0,'#dcae64');sandG.addColorStop(.12,'#f3d28f');sandG.addColorStop(1,'#f8e0a8');
+  // sky and sea gradients (copying an image is much cheaper than filling a gradient every frame)
+  skyBase=document.createElement('canvas');skyBase.width=Math.ceil(W*dpr);skyBase.height=Math.max(1,Math.ceil((sandY+30)*dpr));
+  const k=skyBase.getContext('2d');k.setTransform(dpr,0,0,dpr,0,0);
+  k.fillStyle=skyG;k.fillRect(0,0,W,horizon+2);k.fillStyle=seaG;k.fillRect(0,horizon,W,sandY-horizon+30);
+  // everything below the wavy sand edge (gradient, specks, starfish) never moves
+  sandTop=sandY+9;sandBase=document.createElement('canvas');
+  sandBase.width=Math.ceil(W*dpr);sandBase.height=Math.max(1,Math.ceil((H-sandTop)*dpr));
+  const c=ctx;ctx=sandBase.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,-sandTop*dpr);
+  ctx.fillStyle=sandG;ctx.fillRect(0,sandTop,W,H-sandTop);
+  ctx.fillStyle='rgba(160,110,50,.35)';
+  ctx.beginPath();for(const[a,b,r]of speck){const x=a*W,y=sandY+34+b*(H-sandY-34);ctx.moveTo(x+r,y);ctx.arc(x,y,r,0,7)}ctx.fill();
+  star(W*.12,sandY+(H-sandY)*.55,20,.3);star(W*.82,sandY+(H-sandY)*.72,13,-.4);
+  ctx=c;
+}
 
 // equations
 function gen(){
@@ -387,8 +411,7 @@ function palm(px,py){
   ctx.fillStyle='#7a4b24';[[-8,10],[8,12]].forEach(([a,b])=>{ctx.beginPath();ctx.arc(tx+a,ty+b,9,0,7);ctx.fill();ctx.lineWidth=3;ctx.stroke()});
 }
 function scene(){
-  let g=ctx.createLinearGradient(0,0,0,horizon);g.addColorStop(0,'#5fcbff');g.addColorStop(1,'#d9f5ff');
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,horizon+2);
+  ctx.drawImage(skyBase,0,0,skyBase.width/dpr,skyBase.height/dpr);
   // sun
   const sx=W*.8,sy=H*.15,R=48*S;
   ctx.lineCap='round';ctx.strokeStyle=INK;ctx.lineWidth=5;
@@ -399,8 +422,6 @@ function scene(){
     cloud(((o*W+T*sp)%(W+240))-120,y,s*S);
   });
   // sea
-  g=ctx.createLinearGradient(0,horizon,0,sandY+20);g.addColorStop(0,'#4fd3df');g.addColorStop(1,'#0e8fb8');
-  ctx.fillStyle=g;ctx.fillRect(0,horizon,W,sandY-horizon+30);
   ctx.strokeStyle=INK;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,horizon);ctx.lineTo(W,horizon);ctx.stroke();
   ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=3;
   for(let i=0;i<6;i++){
@@ -415,11 +436,9 @@ function sand(){
   const path=o=>{ctx.beginPath();ctx.moveTo(0,H);for(let x=0;x<=W+10;x+=10)ctx.lineTo(x,ys(x)+o);ctx.lineTo(W,H);ctx.closePath()};
   path(-8);ctx.fillStyle='#fff';ctx.fill();
   path(0);
-  const g=ctx.createLinearGradient(0,sandY,0,H);g.addColorStop(0,'#dcae64');g.addColorStop(.12,'#f3d28f');g.addColorStop(1,'#f8e0a8');
-  ctx.fillStyle=g;ctx.fill();ctx.lineWidth=4;ctx.strokeStyle=INK;ctx.stroke();
-  ctx.fillStyle='rgba(160,110,50,.35)';
-  ctx.beginPath();for(const[a,b,r]of speck){const x=a*W,y=sandY+34+b*(H-sandY-34);ctx.moveTo(x+r,y);ctx.arc(x,y,r,0,7)}ctx.fill();
-  star(W*.12,sandY+(H-sandY)*.55,20,.3);star(W*.82,sandY+(H-sandY)*.72,13,-.4);
+  ctx.fillStyle=sandG;ctx.fill();
+  ctx.drawImage(sandBase,0,sandTop,sandBase.width/dpr,sandBase.height/dpr);
+  ctx.lineWidth=4;ctx.strokeStyle=INK;ctx.stroke();
 }
 function drawBubbles(){
   ctx.globalAlpha=1;
@@ -461,6 +480,8 @@ if(window.matchMedia&&matchMedia('(pointer:coarse)').matches)$('ovP').textConten
 resize();hud();showAns();
 requestAnimationFrame(loop);
 $('go').focus();
+// offline play and instant repeat visits
+if('serviceWorker'in navigator&&location.protocol==='https:')addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 </body>
 </html>

@@ -1,0 +1,14 @@
+{
+  "name": "Bubble Math Beach",
+  "short_name": "Bubble Math",
+  "description": "A calm mental-math game: pop falling bubbles by solving quick equations.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#7fd8ff",
+  "theme_color": "#5fcbff",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
