@@ -3,7 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bubble Math Beach</title>
+<title>Bubble Math Beach: A Calm Mental Math Game</title>
+<meta name="description" content="Pop bubbles by solving quick mental-math equations on a cartoon beach. Free, relaxing and no sign-up. Practice addition, subtraction, multiplication and division across 9 levels.">
+<meta name="keywords" content="mental math game, math bubbles game, free math game, brain training, arithmetic practice, addition subtraction multiplication division">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#5fcbff">
+<link rel="canonical" href="https://ekta-bhoraniya.github.io/Bubble-Math/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%220%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%235fcbff%22/%3E%3Cstop offset=%221%22 stop-color=%22%23d9f5ff%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22url(%23g)%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2221%22 fill=%22%23fff%22 fill-opacity=%22.55%22 stroke=%22%231d3b5c%22 stroke-width=%223%22/%3E%3Cpath d=%22M32 22v20M22 32h20%22 stroke=%22%231d3b5c%22 stroke-width=%225%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M19 28a14 14 0 0 1 9-9%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bubble Math Beach">
+<meta property="og:title" content="Bubble Math Beach: A Calm Mental Math Game">
+<meta property="og:description" content="Pop bubbles by solving quick mental-math equations on a cartoon beach. Free, relaxing and no sign-up. Practice addition, subtraction, multiplication and division across 9 levels.">
+<meta property="og:url" content="https://ekta-bhoraniya.github.io/Bubble-Math/">
+<meta property="og:image" content="https://ekta-bhoraniya.github.io/Bubble-Math/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cartoon beach with floating bubbles that contain math equations such as 7 + 5 and 9 × 6">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bubble Math Beach: A Calm Mental Math Game">
+<meta name="twitter:description" content="Pop bubbles by solving quick mental-math equations on a cartoon beach. Free, relaxing and no sign-up. Practice addition, subtraction, multiplication and division across 9 levels.">
+<meta name="twitter:image" content="https://ekta-bhoraniya.github.io/Bubble-Math/og-image.png">
+<meta name="twitter:image:alt" content="Cartoon beach with floating bubbles that contain math equations such as 7 + 5 and 9 × 6">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Bubble Math Beach","description":"Pop bubbles by solving quick mental-math equations on a cartoon beach. Free, relaxing and no sign-up. Practice addition, subtraction, multiplication and division across 9 levels.","url":"https://ekta-bhoraniya.github.io/Bubble-Math/","image":"https://ekta-bhoraniya.github.io/Bubble-Math/og-image.png","genre":["Educational","Puzzle"],"gamePlatform":"Web browser","applicationCategory":"Game","operatingSystem":"Any","inLanguage":"en","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap">
 <style>
 :root{--ink:#1d3b5c;--card:#fff8e6;--fg:#1d3b5c;--coral:#ff6b57;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -11,7 +36,10 @@
 :root[data-theme="dark"]{--card:#173152;--fg:#fff3d1}
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 body{height:100%;margin:0;background:#7fd8ff;overflow:hidden;font-family:"Baloo 2","Trebuchet MS","Comic Sans MS",system-ui,sans-serif;color:var(--fg)}
-#stage{position:relative;width:100%;height:100%}
+#stage{position:relative;width:100%;height:100%;display:flex;flex-direction:column}
+#play{position:relative;flex:1;min-height:0;min-width:0}
+#pad{display:none}
+.grp{display:flex;gap:10px;align-items:center;margin-left:auto}
 canvas{display:block;width:100%;height:100%}
 #hud{position:absolute;top:12px;left:16px;right:16px;display:flex;justify-content:space-between;gap:12px;pointer-events:none;font-weight:800;font-size:22px}
 .pill{background:var(--card);color:var(--fg);border:3px solid var(--ink);border-radius:999px;padding:0 16px;box-shadow:0 3px 0 var(--ink)}
@@ -31,17 +59,44 @@ button{font:inherit;font-weight:800;font-size:24px;color:#fff;background:var(--c
 button:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
 button:focus-visible{outline:4px solid #ffd23f;outline-offset:3px}
 @media (prefers-reduced-motion:reduce){#answer::after{animation:none}}
+@supports (height:100dvh){html{height:100dvh}}
+html{touch-action:manipulation}
+body{overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+@media (pointer:coarse){
+  #pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 14px;background:#f3d28f;border-top:4px solid var(--ink)}
+  #pad button{font-size:30px;padding:0;height:clamp(48px,8.5vh,70px);background:var(--card);color:var(--fg);box-shadow:0 4px 0 var(--ink);border-radius:18px;touch-action:manipulation}
+  #pad button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+}
+@media (pointer:coarse) and (orientation:landscape){
+  #stage{flex-direction:row}
+  #pad{width:min(34vw,260px);flex:none;border-top:0;border-left:4px solid var(--ink);align-content:center}
+  #pad button{height:clamp(44px,17vh,64px)}
+}
+@media (max-width:640px){
+  #hud{top:8px;left:8px;right:8px;gap:6px;font-size:16px;flex-wrap:wrap}
+  .pill{padding:0 10px;border-width:2px;box-shadow:0 2px 0 var(--ink)}
+  .grp{gap:6px}
+  #quit,#snd{font-size:15px;padding:0 10px;border-width:2px}
+  #answer{min-width:130px;height:52px;line-height:52px;font-size:34px}
+  .panel{margin:16px;padding:20px 22px}
+  .panel h1{font-size:32px}
+  .panel p{font-size:16px}
+}
 </style>
 </head>
 <body>
+<noscript>Bubble Math Beach is a free mental-math game. Turn on JavaScript to play: pop falling bubbles by typing the answers to quick equations.</noscript>
 <div id="stage">
+  <div id="play">
   <canvas id="c"></canvas>
   <div id="hud">
     <div class="pill">Score <span id="sc">0</span> &nbsp; Best <span id="bs">0</span></div>
     <div class="pill">Level <span id="lv">1</span></div>
-    <div style="display:flex;gap:10px;align-items:center"><div class="pill" id="hearts"></div><button id="snd">Sound on</button><button id="quit">Quit</button></div>
+    <div class="grp"><div class="pill" id="hearts"></div><button id="snd" title="Sound (M)" aria-label="Toggle sound">🔊</button><button id="quit">Quit</button></div>
   </div>
   <div id="answer"></div>
+  </div>
+  <div id="pad"></div>
   <div id="ov"><div class="panel">
     <h1 id="ovT">Bubble Math Beach</h1>
     <p id="ovP">Bubbles with sums are falling toward the sand. Type the answer to pop each one before it lands. You have 5 lives.</p>
@@ -53,7 +108,7 @@ const INK='#1d3b5c',cv=document.getElementById('c'),ctx=cv.getContext('2d');
 const $=id=>document.getElementById(id),ov=$('ov'),ans=$('answer');
 const F=s=>`800 ${s}px "Baloo 2","Trebuchet MS",system-ui,sans-serif`;
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
-let W,H,dpr,horizon,sandY,T=0,t=0,st='idle',lives=5,score=0,level=0,prevLevel=0,typed='',lastSpawn=-9,streak=0,levelTime=0,shake=0,flash=0,badTimer,matchTimer,best=0;
+let W,H,S=1,dpr,horizon,sandY,T=0,t=0,st='idle',lives=5,score=0,level=0,prevLevel=0,typed='',lastSpawn=-9,streak=0,levelTime=0,shake=0,flash=0,badTimer,matchTimer,best=0;
 let bubbles=[],decoys=[],parts=[],floats=[];
 try{best=+localStorage.getItem('bmb-best')||0}catch(e){}
 const speck=Array.from({length:140},()=>[Math.random(),Math.random(),1+Math.random()*3]);
@@ -70,16 +125,17 @@ const sprites=['160,225,255','255,190,225','190,255,215'].map(c=>{
 });
 
 function resize(){
-  dpr=Math.min(devicePixelRatio||1,2);W=$('stage').clientWidth;H=$('stage').clientHeight;
+  dpr=Math.min(devicePixelRatio||1,2);W=$('play').clientWidth;H=$('play').clientHeight;
+  S=Math.max(.75,Math.min(1,Math.min(W,H*1.2)/700));
   cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
-  horizon=H*.4;sandY=H*.8;
+  horizon=H*.4;sandY=H-Math.max(90,H*.2);
   if(!decoys.length)for(let i=0;i<100;i++)decoys.push(newDecoy(true));
 }
 function newDecoy(init){
-  const r=6+Math.random()*16;
+  const r=(6+Math.random()*16)*S;
   return{x:Math.random()*W,y:init?Math.random()*H:-r-Math.random()*H*.5,r,v:H*(.05+Math.random()*.07),ph:Math.random()*6,sp:rnd(0,2),a:.45+Math.random()*.4};
 }
-addEventListener('resize',resize);
+if(window.ResizeObserver)new ResizeObserver(resize).observe($('play'));else addEventListener('resize',resize);
 
 // equations
 function gen(){
@@ -95,8 +151,8 @@ function gen(){
   return{eq:'1 + 1',ans:2};
 }
 function spawn(){
-  const{eq,ans}=gen();ctx.font=F(26);
-  const r=Math.max(42,ctx.measureText(eq).width/2+16);let x=W/2;
+  const{eq,ans}=gen();ctx.font=F(26*S);
+  const r=Math.max(42*S,ctx.measureText(eq).width/2+16*S);let x=W/2;
   for(let i=0;i<25;i++){
     x=r+20+Math.random()*(W-2*r-40);
     if(!bubbles.some(o=>o.y<250&&Math.abs(o.x0-x)<o.r+r+16))break;
@@ -143,7 +199,7 @@ function initAudio(){
   });
 }
 function oceanFade(on){if(AC&&oceanG)oceanG.gain.setTargetAtTime(on?1:0,AC.currentTime,on?3:1.5)}
-function toggleSound(){soundOn=!soundOn;$('snd').textContent='Sound '+(soundOn?'on':'off');if(master)master.gain.setTargetAtTime(soundOn?1:0,AC.currentTime,.05)}
+function toggleSound(){soundOn=!soundOn;$('snd').textContent=soundOn?'🔊':'🔇';if(master)master.gain.setTargetAtTime(soundOn?1:0,AC.currentTime,.05)}
 function sPop(){
   if(!AC||!soundOn)return;const t0=AC.currentTime,f=500+Math.random()*500;
   const o=AC.createOscillator(),g=AC.createGain();o.type='sine';
@@ -237,13 +293,21 @@ function quit(){
 $('go').addEventListener('click',start);
 $('snd').addEventListener('click',e=>{e.currentTarget.blur();toggleSound()});
 $('quit').addEventListener('click',e=>{e.currentTarget.blur();quit()});
+// one input path for the physical keyboard and the on-screen keypad
+function press(k){
+  if(st!=='play')return;
+  if(/^\d$/.test(k)){if(typed.length<4)typed+=k;showAns();check()}
+  else if(k==='Backspace'){typed=typed.slice(0,-1);clearTimeout(matchTimer);release();showAns()}
+  else if(k==='Escape'){typed='';clearTimeout(matchTimer);release();showAns()}
+}
 addEventListener('keydown',e=>{
   if(e.key==='m'||e.key==='M'){toggleSound();return}
   if(st!=='play'){if(e.key==='Enter'||e.key===' '){e.preventDefault();start()}return}
-  if(/^\d$/.test(e.key)){if(typed.length<4)typed+=e.key;showAns();check();e.preventDefault()}
-  else if(e.key==='Backspace'){typed=typed.slice(0,-1);clearTimeout(matchTimer);release();showAns();e.preventDefault()}
-  else if(e.key==='Escape'){typed='';clearTimeout(matchTimer);release();showAns()}
+  if(/^\d$/.test(e.key)||e.key==='Backspace'||e.key==='Escape'){press(e.key);e.preventDefault()}
 });
+const pad=$('pad');
+['1','2','3','4','5','6','7','8','9','⌫','0','C'].forEach(k=>{const b=document.createElement('button');b.textContent=k;b.dataset.k=k==='⌫'?'Backspace':k==='C'?'Escape':k;b.setAttribute('aria-label',k==='⌫'?'Backspace':k==='C'?'Clear':k);pad.appendChild(b)});
+pad.addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();press(b.dataset.k)});
 
 // update
 function update(dt){
@@ -300,13 +364,13 @@ function scene(){
   let g=ctx.createLinearGradient(0,0,0,horizon);g.addColorStop(0,'#5fcbff');g.addColorStop(1,'#d9f5ff');
   ctx.fillStyle=g;ctx.fillRect(0,0,W,horizon+2);
   // sun
-  const sx=W*.8,sy=H*.15;
+  const sx=W*.8,sy=H*.15,R=48*S;
   ctx.lineCap='round';ctx.strokeStyle=INK;ctx.lineWidth=5;
-  for(let i=0;i<12;i++){const a=i*Math.PI/6+T*.25;ctx.beginPath();ctx.moveTo(sx+Math.cos(a)*62,sy+Math.sin(a)*62);ctx.lineTo(sx+Math.cos(a)*80,sy+Math.sin(a)*80);ctx.stroke()}
-  ctx.beginPath();ctx.arc(sx,sy,48,0,7);ctx.fillStyle='#ffd23f';ctx.fill();ctx.stroke();
+  for(let i=0;i<12;i++){const a=i*Math.PI/6+T*.25;ctx.beginPath();ctx.moveTo(sx+Math.cos(a)*R*1.3,sy+Math.sin(a)*R*1.3);ctx.lineTo(sx+Math.cos(a)*R*1.67,sy+Math.sin(a)*R*1.67);ctx.stroke()}
+  ctx.beginPath();ctx.arc(sx,sy,R,0,7);ctx.fillStyle='#ffd23f';ctx.fill();ctx.stroke();
   // clouds
   [[.1,22,.8,H*.1],[.45,14,1.1,H*.2],[.7,18,.7,H*.07]].forEach(([o,sp,s,y])=>{
-    cloud(((o*W+T*sp)%(W+240))-120,y,s);
+    cloud(((o*W+T*sp)%(W+240))-120,y,s*S);
   });
   // sea
   g=ctx.createLinearGradient(0,horizon,0,sandY+20);g.addColorStop(0,'#4fd3df');g.addColorStop(1,'#0e8fb8');
@@ -342,7 +406,7 @@ function drawBubbles(){
     ctx.beginPath();ctx.arc(b.x,b.y,b.r-2,0,7);ctx.fillStyle='rgba(255,255,255,.62)';ctx.fill();
     ctx.drawImage(sprites[0],b.x-b.r,b.y-b.r,b.r*2,b.r*2);
     if(typed&&vis(b)&&String(b.ans).startsWith(typed)){ctx.beginPath();ctx.arc(b.x,b.y,b.r+5,0,7);ctx.lineWidth=5;ctx.strokeStyle='#ffd23f';ctx.stroke()}
-    ctx.font=F(26);ctx.fillStyle=INK;ctx.fillText(b.eq,b.x,b.y+3);
+    ctx.font=F(26*S);ctx.fillStyle=INK;ctx.fillText(b.eq,b.x,b.y+3);
   }
 }
 function fx(){
@@ -367,6 +431,7 @@ function loop(now){
   const dt=Math.min(.05,(now-last)/1000);last=now;
   update(dt);draw();requestAnimationFrame(loop);
 }
+if(window.matchMedia&&matchMedia('(pointer:coarse)').matches)$('ovP').textContent='Bubbles with sums are falling toward the sand. Tap the answer on the keypad to pop each one before it lands. You have 5 lives.';
 resize();hud();showAns();
 requestAnimationFrame(loop);
 $('go').focus();

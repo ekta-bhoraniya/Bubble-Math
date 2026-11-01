@@ -1,14 +1,14 @@
-# Bubble-Math
+# Bubble Math Beach
 
 A relaxing mental-math game set on a cartoon beach. Bubbles with equations fall toward the sand. Type the answer to pop each one before it lands. You have 5 lives.
 
-**Play it:** [https://ekta-bhoraniya.github.io/Bubble-Math/](https://ekta-bhoraniya.github.io/Bubble-Math/)
+**Play it:** https://ekta-bhoraniya.github.io/Bubble-Math/
 
 ## How to play
 
 - Type the answer to an equation bubble. It pops as soon as your number matches.
 - A bubble that lands on the sand costs one life, and the game ends when all 5 lives are gone.
-- Press **M** to mute or unmute the sound. Use the **Quit** button to end a round.
+- On a computer, press **M** to mute or unmute the sound. On a phone, tap the speaker icon. Use the **Quit** button to end a round.
 - Only bubbles that are fully on screen can be answered.
 - If your number could be the start of a longer answer on another bubble (for example 1 and 12), the game waits 0.65 seconds before popping the shorter one. A bubble that reaches the sand during that wait is held until the wait ends, so you still get the point.
 
@@ -89,4 +89,21 @@ Because the speed scales with the screen height, taller and shorter windows give
 
 A single `index.html` with no build step and no dependencies. Graphics are drawn on a canvas, and all sounds (ocean ambience, pop, wrong answer, applause) are synthesized with the Web Audio API. The only external request is the Baloo 2 font from Google Fonts. Your best score is saved in your browser.
 
-Built for desktop with a keyboard. Mobile support is planned.
+## Responsive design
+
+- **Desktop:** type with your keyboard. The layout scales to any window size.
+- **Phones and tablets:** an on-screen keypad (0 to 9, backspace and clear) appears automatically on touch devices. In landscape the keypad moves to the side so the play area stays large.
+- Bubbles, text and scenery scale down on small screens, with a minimum size so equations stay readable. The top bar wraps on narrow screens, and the sound button is an icon.
+- The time to answer a bubble stays about the same on every screen size, because the fall speed is tied to the height of the play area.
+
+## Files
+
+| File | Purpose |
+|---|---|
+| `index.html` | The whole game |
+| `og-image.png` | 1200 × 630 preview image for social media and chat links |
+| `favicon.svg`, `favicon.ico`, `favicon-48.png`, `apple-touch-icon.png` | Browser tab and home-screen icons |
+| `icon-192.png`, `icon-512.png` | Larger app icons for future use |
+| `sitemap.xml` | Lists the page for search engines |
+
+The page includes a title, description, canonical link, Open Graph and Twitter card tags, and structured data (schema.org `VideoGame`) for search results and link previews. If you change the site address, update the URLs in the `<head>` of `index.html` and in `sitemap.xml`.
