@@ -529,10 +529,7 @@ function tutUpdate(dt){
 function askReady(){
   leaveTut();st='ask';
   try{localStorage.setItem('bmb-tut','1')}catch(e){}tutDone=true;
-  panel('Ready to play?','The real game starts now: more bubbles, 5 lives, and the sums get harder as you go.',[["Yes, let's go",countdown],['Not yet',askRestart,1]]);
-}
-function askRestart(){
-  panel('No problem','Would you like to go through the walk-through again?',[['Show me again',tutStart],['Back to start',title,1]]);
+  panel('Ready to play?','The real game starts now: more bubbles, 5 lives, and the sums get harder as you go.',[["Yes, let's go",countdown],['Not yet',title,1]]);
 }
 function countdown(){
   leaveTut();st='count';ov.hidden=true;score=0;lives=5;level=0;hud();initAudio();oceanFade(true);
