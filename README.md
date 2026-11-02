@@ -22,7 +22,7 @@ The first time you press **Start popping**, a short walk-through runs before the
 4. Two more bubbles fall slowly. In the walk-through a bubble waits on the sand instead of costing a life.
 5. The hearts glow while the tip explains lives and levels.
 
-Then the game asks **Ready to play?** Choose **Yes** for a 3, 2, 1, Go! countdown into the real game. Choose **Not yet** to be asked whether you want the walk-through again, or to go back to the start screen. You can press **Skip tutorial** at any point, and **Quit** leaves the walk-through.
+Then the game asks **Ready to play?** Choose **Yes** for a 3, 2, 1, Go! countdown into the real game. Choose **Not yet** to go back to the start screen, where **Start popping** and **How to play** are waiting. You can press **Skip tutorial** at any point, and **Quit** leaves the walk-through.
 
 After the first time, the start screen and the game-over screen have a **How to play** button that runs it again. The walk-through score doesn't count toward your best.
 
