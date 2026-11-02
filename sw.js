@@ -1,7 +1,7 @@
 // Bubble Math Beach service worker: makes the game load instantly and work offline.
 // Strategy: serve from cache right away, then refresh the cache in the background,
 // so a new version of the game shows up on the next visit.
-const CACHE = 'bmb-v1';
+const CACHE = 'bmb-v2';
 const FILES = ['./', 'index.html', 'baloo2.woff2', 'manifest.webmanifest', 'favicon.ico', 'favicon-48.png', 'apple-touch-icon.png', 'icon-192.png'];
 
 self.addEventListener('install', e => {
