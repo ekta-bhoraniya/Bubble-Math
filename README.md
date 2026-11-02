@@ -12,6 +12,20 @@ A relaxing mental-math game set on a cartoon beach. Bubbles with equations fall 
 - Only bubbles that are fully on screen can be answered.
 - If your number could be the start of a longer answer on another bubble (for example 1 and 12), the game waits 0.65 seconds before popping the shorter one. A bubble that reaches the sand during that wait is held until the wait ends, so you still get the point.
 
+## First-time walk-through
+
+The first time you press **Start popping**, a short walk-through runs before the real game:
+
+1. A single bubble (2 + 3) floats down and waits. A tip asks you to work out the sum.
+2. An arrow points at the answer box. Type (or tap) numbers until you get it right. A wrong number shakes the box, and after two misses you get a hint.
+3. The bubble pops, and the score glows as it goes from 0 to 10.
+4. Two more bubbles fall slowly. In the walk-through a bubble waits on the sand instead of costing a life.
+5. The hearts glow while the tip explains lives and levels.
+
+Then the game asks **Ready to play?** Choose **Yes** for a 3, 2, 1, Go! countdown into the real game. Choose **Not yet** to be asked whether you want the walk-through again, or to go back to the start screen. You can press **Skip tutorial** at any point, and **Quit** leaves the walk-through.
+
+After the first time, the start screen and the game-over screen have a **How to play** button that runs it again. The walk-through score doesn't count toward your best.
+
 ## Level-up logic
 
 The game has 9 levels. You move up to the next level when **both** of these are true:
