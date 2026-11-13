@@ -409,11 +409,12 @@ function start(){
   initAudio();oceanFade(true);setTimeout(buildClap,60);ov.hidden=true;ans.style.visibility='visible';ans.classList.remove('bad');showAns();hud();
 }
 // overlay panel with any number of buttons; the first one is the main action
+let panelReady=false;
 function panel(title,text,btns){
   $('ovT').textContent=title;$('ovP').textContent=text;
   const box=$('btns');box.textContent='';
   btns.forEach(([label,fn,alt])=>{const b=document.createElement('button');b.textContent=label;if(alt)b.className='alt';b.addEventListener('click',fn);box.appendChild(b)});
-  ov.hidden=false;box.firstChild.focus();
+  ov.hidden=false;if(panelReady)box.firstChild.focus({preventScroll:true});panelReady=true;
 }
 const AGAIN=()=>[['Play again',start],['How to play',tutStart,1]];
 function end(){
